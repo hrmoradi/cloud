@@ -1,1 +1,19 @@
 curl -s -X POST -H "Content-Type: application/json" --data-binary @request.json  https://vision.googleapis.com/v1/images:annotate?key=${API_KEY}
+
+export PROJECT_ID=$DEVSHELL_PROJECT_ID
+export BUCKET=$PROJECT_ID
+
+gsutil mb -p $PROJECT_ID \
+    -c standard    \
+    -l us-central1 \
+    gs://${BUCKET}-new
+    
+gsutil -m cp -r gs://car_damage_lab_images/* gs://${BUCKET}-new
+
+gsutil cp gs://car_damage_lab_metadata/data.csv .
+cat ./data.csv
+
+sed -i -e "s/car_damage_lab_images/${BUCKET}-new/g" ./data.csv
+cat ./data.csv
+
+gsutil cp ./data.csv gs://${BUCKET}-new
